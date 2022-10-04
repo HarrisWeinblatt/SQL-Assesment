@@ -34,7 +34,8 @@ USING (user_id);
 
 /* which schools prefer which courses*/
 WITH all_dat AS (
-  SELECT * FROM users
+  SELECT *
+  FROM users
   LEFT JOIN progress
     ON users.user_id = progress.user_id
 ),
