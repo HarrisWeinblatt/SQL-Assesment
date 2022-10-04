@@ -1,0 +1,106 @@
+/* data from both table */
+SELECT *
+FROM progress;
+SELECT *
+FROM users;
+
+/* top 25 schools */
+SELECT email_domain, COUNT (*) as "Top 25 Schools"
+FROM users
+GROUP BY 1
+ORDER BY COUNT(email_domain) DESC
+LIMIT 25;
+
+/* learners in New York */
+SELECT COUNT(*) as 'Learners located in New York'
+FROM users
+WHERE city = 'New York';
+
+/* learners using the mobile app */
+SELECT COUNT(*) as "Learners using the Mobile App"
+FROM users
+WHERE mobile_app IS NOT NULL;
+
+/* sign-up date and time using strftime function*/
+SELECT strftime('%H', sign_up_at) AS 'Hour of the Day', COUNT(*) AS 'Learners that signed up'
+FROM users
+GROUP BY 1;
+
+/* join the 2 tables */
+SELECT *
+FROM users
+JOIN progress
+USING (user_id);
+
+/* which schools prefer which courses*/
+WITH all_dat AS (
+  SELECT * FROM users
+  LEFT JOIN progress
+    ON users.user_id = progress.user_id
+),
+learners AS( 
+  SELECT user_id,
+  CASE
+    WHEN a.learn_cpp = 'completed' OR a.learn_cpp = 'started' THEN 1
+    ELSE 0
+  END AS learns_cpp,
+  CASE
+    WHEN a.learn_sql = 'completed' OR a.learn_sql = 'started' THEN 1
+    ELSE 0
+  END AS learns_sql,
+  CASE
+    WHEN a.learn_html = 'completed' OR a.learn_html = 'started' THEN 1
+    ELSE 0
+  END AS learns_html,
+  CASE
+    WHEN a.learn_javascript = 'completed' OR a.learn_javascript = 'started' THEN 1
+    ELSE 0
+  END AS learns_JS,
+  CASE
+    WHEN a.learn_java = 'completed' OR a.learn_java = 'started' THEN 1
+    ELSE 0
+  END AS learns_java
+  FROM all_dat a
+) 
+SELECT a.email_domain, 
+  SUM(learns_cpp) as cpp, 
+  SUM(learns_sql) as sql, 
+  SUM(learns_html) as html, 
+  SUM(learns_JS) as JS, 
+  SUM(learns_java) as java
+FROM all_dat a
+LEFT JOIN learners l
+  ON a.user_id = l.user_id
+GROUP BY a.email_domain;
+
+/* courses the New York students are taking*/
+WITH join_table AS 
+(SELECT *
+FROM users AS u
+LEFT JOIN progress AS p
+  ON u.user_id = p.user_id)
+SELECT city, 
+COUNT(CASE WHEN learn_sql IN ('completed', 'started') THEN 1 END) AS sql, 
+COUNT(CASE WHEN learn_cpp IN ('completed', 'started') THEN 1 END) AS cpp, 
+COUNT(CASE WHEN learn_html IN ('completed', 'started') THEN 1 END) AS html,
+COUNT(CASE WHEN learn_javascript IN ('completed', 'started') THEN 1 END) AS javascript,
+COUNT(CASE WHEN learn_java IN ('completed', 'started') THEN 1 END) AS java, COUNT(city) AS total
+FROM join_table
+GROUP BY city
+HAVING city IN ('New York');
+
+/* courses the Chicago student are taking*/
+WITH join_table AS 
+(SELECT *
+FROM users AS u
+LEFT JOIN progress AS p
+  ON u.user_id = p.user_id)
+SELECT city, 
+COUNT(CASE WHEN learn_sql IN ('completed', 'started') THEN 1 END) AS sql, 
+COUNT(CASE WHEN learn_cpp IN ('completed', 'started') THEN 1 END) AS cpp, 
+COUNT(CASE WHEN learn_html IN ('completed', 'started') THEN 1 END) AS html,
+COUNT(CASE WHEN learn_javascript IN ('completed', 'started') THEN 1 END) AS javascript,
+COUNT(CASE WHEN learn_java IN ('completed', 'started') THEN 1 END) AS java, COUNT(city) AS total
+FROM join_table
+GROUP BY city
+HAVING city IN ('Chicago');
