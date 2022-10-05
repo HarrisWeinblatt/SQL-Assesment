@@ -29,8 +29,8 @@ GROUP BY 1;
 /* join the 2 tables */
 SELECT *
 FROM users
-JOIN progress
-USING (user_id);
+LEFT JOIN progress
+ ON users.user_id = progress.user_id;
 
 /* which schools prefer which courses*/
 WITH all_dat AS (
