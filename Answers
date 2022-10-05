@@ -43,46 +43,36 @@ WITH temporary_name AS (
     ORDER BY email_domain ASC;
 
 /* which schools prefer which courses complex*/
-WITH all_dat AS (
-  SELECT *
+SELECT users.email_domain,
+  COUNT(CASE
+    WHEN progress.learn_cpp = 'completed'
+    OR progress.learn_cpp = 'started'
+    THEN '1'
+    END) AS 'cpp',
+    COUNT(CASE
+    WHEN progress.learn_sql = 'completed'
+    OR progress.learn_sql = 'started'
+    THEN '1'
+    END) AS 'sql',
+    COUNT(CASE
+    WHEN progress.learn_html = 'completed'
+    OR progress.learn_html = 'started'
+    THEN '1'
+    END) AS 'html',
+    COUNT(CASE
+    WHEN progress.learn_javascript = 'completed'
+    OR progress.learn_javascript = 'started'
+    THEN '1'
+    END) AS 'js',
+    COUNT(CASE
+    WHEN progress.learn_java = 'completed'
+    OR progress.learn_java = 'started'
+    THEN '1'
+    END) AS 'java'
   FROM users
   LEFT JOIN progress
-    ON users.user_id = progress.user_id
-),
-learners AS( 
-  SELECT user_id,
-  CASE
-    WHEN a.learn_cpp = 'completed' OR a.learn_cpp = 'started' THEN 1
-    ELSE 0
-  END AS learns_cpp,
-  CASE
-    WHEN a.learn_sql = 'completed' OR a.learn_sql = 'started' THEN 1
-    ELSE 0
-  END AS learns_sql,
-  CASE
-    WHEN a.learn_html = 'completed' OR a.learn_html = 'started' THEN 1
-    ELSE 0
-  END AS learns_html,
-  CASE
-    WHEN a.learn_javascript = 'completed' OR a.learn_javascript = 'started' THEN 1
-    ELSE 0
-  END AS learns_JS,
-  CASE
-    WHEN a.learn_java = 'completed' OR a.learn_java = 'started' THEN 1
-    ELSE 0
-  END AS learns_java
-  FROM all_dat a
-) 
-SELECT a.email_domain, 
-  SUM(learns_cpp) as cpp, 
-  SUM(learns_sql) as sql, 
-  SUM(learns_html) as html, 
-  SUM(learns_JS) as JS, 
-  SUM(learns_java) as java
-FROM all_dat a
-LEFT JOIN learners l
-  ON a.user_id = l.user_id
-GROUP BY a.email_domain;
+  ON users.user_id = progress.user_id
+  GROUP BY 1;
 
 /* courses the New York students are taking*/
 WITH temporary_name AS (
