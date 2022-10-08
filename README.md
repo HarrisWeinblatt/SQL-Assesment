@@ -1,1 +1,2 @@
-# SQL Querries
+# SQL Queries
+These queries are using 2 different tables with similar user in each table. One table has the classes taken by each student, whereas the other table has the personal details of each student, specifically their emails which tells which university they are attending. The queries determine the top 25 schools, the learners that are located in New York, learners that use the mobile app, sign up date and time, which schools prefer which courses(simple and complex queries), and what courses students from 2 different cities prefer.
